@@ -1,8 +1,14 @@
 public class Game {
 
+    enum PlayerName {
+        HUMAN,
+        COMPUTER
+    }
     static void startNewGame() {
         gameSetup();
     }
+
+
 
     private static void gameSetup() {
         // Testēšanas laikā var samazināt lowerBound
