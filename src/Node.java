@@ -10,7 +10,7 @@ public class Node {
     private List<Node> parentList = new LinkedList<Node>();
 
     // Heiristiskās funkcijas novērtējums konkrētajai virsotnei
-    private int heuristic;
+    private int heuristic = 1;
     // Relatīvi noteiktais gājiens pēc kārtas konkrētajā grafā
     private int turn;
 

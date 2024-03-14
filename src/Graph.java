@@ -12,8 +12,8 @@ public class Graph {
     }
 
     void createGraph(int[] playerScores, NumberString numberString) {
-        this.graph = new Node(playerScores, numberString, this.graph, 0);
-        int turn = 1;
+        this.graph = new Node(playerScores, numberString, this.graph, -1);
+        int turn = 0;
         addNodes(playerScores, numberString, turn, this.graph);
     }
 
