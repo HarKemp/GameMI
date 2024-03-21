@@ -1,16 +1,24 @@
 public class Game {
 
-    enum PlayerName {
+    // Cik dziļu grafu ģenerēt - cik gājienus uz priekšu
+    // Ja šo uzliks par dziļu, tad varbūt nokārsies programma
+    // Ja MAX_DEPTH ir 8, tad grafs lieto aptuveni 2 GB RAM
+    static final private int MAX_DEPTH = 9;
+    // Ik pēc cik gājieniem ģenerēt jaunu grafu
+    static final private int VALID_TURNS = MAX_DEPTH;
+
+    enum playerNames {
         HUMAN,
         COMPUTER
     }
-    static void startNewGame() {
-        gameSetup();
+
+
+    static void startNewGame(int mode) {
+        gameSetup(mode);
     }
 
 
-
-    private static void gameSetup() {
+    private static void gameSetup(int mode) {
         // Testēšanas laikā var samazināt lowerBound
         // Nosaka ierobežojumus skaitļu virknes garumam
         int lowerBound = 5; // Kad pabeigts jābūt 15
@@ -62,38 +70,81 @@ public class Game {
         // Izveido ciparu virkni
         NumberString nS = new NumberString(length);
 
+        // Nosaka pašreizējo gājienu
+        int currentTurn = 0;
+        // Nosaka gājienu līdz kuram ir derīgs pašlaik uzģenerētais grafs
+        int generatedUntilTurn = 0;
+        // Uztaisa tukšu grafu kā placeholder
+        Graph graph = new Graph();
 
         // Pilda gājienus līdz simbolu virkne ir tukša
         while(!nS.isEmpty()) {
+            // Ģenerē grafu
+            if (playerMove == 1 && generatedUntilTurn <= currentTurn) {
+                generatedUntilTurn = currentTurn + VALID_TURNS;
+                graph = new Graph(playerScores, nS, MAX_DEPTH);
+            }
+
+            //TODO TEST - Izvada grafu terminālī (Beigās jāizņem ārā no koda)
+            if (mode == 1) {
+                graph.printGraph(VALID_TURNS - (generatedUntilTurn - currentTurn));
+            }
+
             // Ja gājiena izpildes laikā notika kļūda (visdrīzāk ar ievadi), tad gājienu veic vēlreiz
-            if (!takeTurn(nS, playerScores, playerMove)) continue;
+            if (!takeTurn(nS, playerScores, playerMove, graph)) continue;
             // Pāriet uz nākamā spēlētāja gājienu
             playerMove = playerMove == 0 ? 1 : 0;
+            currentTurn++;
         }
 
 
         // Izvada spēles rezultātus
         System.out.println("Game over!");
-        System.out.println("Player 1 points: " + playerScores[0]);
-        System.out.println("Player 2 points: " + playerScores[1]);
+        System.out.println(playerNames.HUMAN + " points: " + playerScores[0]);
+        System.out.println(playerNames.COMPUTER + " points: " + playerScores[1]);
         if (playerScores[0] == playerScores[1]) {
             System.out.println("It's a tie!");
             return;
         }
-        System.out.println("Player " + (playerScores[0] > playerScores[1] ? 1 : 2) + " wins");
+        if (playerScores[0] > playerScores[1])
+            System.out.println(playerNames.HUMAN + " wins");
+        else
+            System.out.println(playerNames.COMPUTER + " wins");
     }
 
+    static boolean takeTurn(NumberString nS, int[] playerScores, int playerMove, Graph graph) {
+        if (playerMove == 0)
+            return takeHumanTurn(nS, playerScores, playerMove);
+        else
+            return takeHumanTurn(nS, playerScores, playerMove);
+            //TODO Pēc tam aizvietot ar
+            //return takeComputerTurn(nS, playerScores, playerMove, graph);
+    }
 
-    static boolean takeTurn(NumberString nS, int[] playerScores, int playerMove) {
+    static boolean takeComputerTurn(NumberString nS, int[] playerScores, int playerMove, Graph graph) {
+        //TODO - Izvēlēties datora veicamo gājienu
+
+        // Kā piekļūt grafa virsotnēm
+        //graph.getRootNode().getChild(0); // Iegūt konkrētās virsotnes n-to bērnu
+        //graph.getRootNode().getChildren(); // Iegūt konkrētās virsotnes bērnu sarakstu
+        // graph.getRootNode().getHeuristic(); // Iegūt virsotnes heiristisko novērtējumu
+        // u.c.
+
+        return false;
+    }
+
+    static boolean takeHumanTurn(NumberString nS, int[] playerScores, int playerMove) {
 
         // Izvada informāciju par spēles pašreizējo stāvokli
         System.out.println("==========================================");
         System.out.println("Numbers: " + nS.convertToString());
-        System.out.println("Player 1 points: " + playerScores[0]);
-        System.out.println("Player 2 points: " + playerScores[1]);
+        System.out.println(playerNames.HUMAN + " points: " + playerScores[0]);
+        System.out.println(playerNames.COMPUTER + " points: " + playerScores[1]);
         System.out.println("==========================================");
-        System.out.println("Player " + (playerMove + 1) + " move!");
-
+        if (playerMove == 0)
+            System.out.println(playerNames.HUMAN + " move!");
+        else
+            System.out.println(playerNames.COMPUTER + " move!");
 
         // Veic gājienu
         System.out.println("Choose move:");

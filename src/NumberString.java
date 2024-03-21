@@ -3,17 +3,15 @@ import java.util.List;
 import java.util.Random;
 
 public class NumberString{
-    private List<Integer> numberString;
+    private List<Integer> numberString = new LinkedList<Integer>();
 
     // Konstruktors
     NumberString() {
-        numberString = new LinkedList<Integer>();
     }
 
     // Konstruktors - izveido nejauši ģenerētu skaitļu virkni
     NumberString(int length) {
         int upperLimit = 4; // Augstākais cipars, ko var uzģenerēt virknē
-        numberString = new LinkedList<Integer>();
         Random rand = new Random();
         for (int i = 0; i < length; i++) {
             int randomDigit = rand.nextInt(upperLimit) + 1;
@@ -23,7 +21,6 @@ public class NumberString{
 
     // Konstruktors - pārveido statisku skaitļu virkni uz sarakstu (Vajadzīgs Node.java implementācijā)
     NumberString (int[] staticArray) {
-        List<Integer> numberString = new LinkedList<Integer>();
         for(int i = 0; i < staticArray.length; i++) {
             numberString.add(staticArray[i]);
         }
