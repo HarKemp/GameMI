@@ -2,9 +2,10 @@ public class Game {
 
     // Cik dziļu grafu ģenerēt - cik gājienus uz priekšu
     // Ja šo uzliks par dziļu, tad varbūt nokārsies programma
-    // Ja MAX_DEPTH ir 8, tad grafs lieto aptuveni 2 GB RAM
-    static final private int MAX_DEPTH = 9;
+    // Augstāk par 7 neiesaku likt
+    static final private int MAX_DEPTH = 3;
     // Ik pēc cik gājieniem ģenerēt jaunu grafu
+    // Var nomainīt uz mazāku skaitli, ja grib svaigāku informāciju
     static final private int VALID_TURNS = MAX_DEPTH;
 
     enum playerNames {
