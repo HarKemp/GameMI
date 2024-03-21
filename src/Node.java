@@ -5,9 +5,9 @@ public class Node {
     private int[] playerScores;
     private int[] numberString;
     // Saraksts ar tiešajiem, šīs virsotnes, bērniem
-    private List<Node> childList = new LinkedList<Node>();
+    private final List<Node> childList = new LinkedList<Node>();
     // Saraksts ar tiešajiem, šīs virsotnes, vecākiem
-    private List<Node> parentList = new LinkedList<Node>();
+    private final List<Node> parentList = new LinkedList<Node>();
 
     // Heiristiskās funkcijas novērtējums konkrētajai virsotnei
     private int heuristic;

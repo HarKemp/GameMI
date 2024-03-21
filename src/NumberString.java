@@ -3,7 +3,7 @@ import java.util.List;
 import java.util.Random;
 
 public class NumberString{
-    private List<Integer> numberString = new LinkedList<Integer>();
+    private final List<Integer> numberString = new LinkedList<Integer>();
 
     // Konstruktors
     NumberString() {
