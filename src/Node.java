@@ -10,7 +10,8 @@ public class Node {
     private final List<Node> parentList = new LinkedList<Node>();
 
     // Heiristiskās funkcijas novērtējums konkrētajai virsotnei
-    private int heuristic;
+    // Noklusējumā -1 (ja šī virsotne nav izveidota datora gājiena rezultātā)
+    private int heuristic = -1;
     // Relatīvi noteiktais gājiens pēc kārtas konkrētajā grafā
     private int turn;
 
@@ -20,7 +21,7 @@ public class Node {
         this.numberString = numberString.convertToStaticArray();
         this.parentList.add(parent);
         this.turn = turn;
-        generateHeuristic();
+        //generateHeuristic();
     }
 
     // Heiristiskā funkcija
@@ -65,6 +66,14 @@ public class Node {
     // Atgriež visu virsotnes bērnu sarakstu
     List<Node> getChildren() {
         return childList;
+    }
+
+    List<Node> getParents() {
+        return parentList;
+    }
+
+    Node getParent() {
+        return parentList.get(0);
     }
 
 }

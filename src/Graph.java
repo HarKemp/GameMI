@@ -13,6 +13,7 @@ public class Graph {
     Graph(int[] playerScores, NumberString numberString, int maxDepth) {
         this.MAX_DEPTH = maxDepth;
         createGraph(playerScores, numberString);
+        generateHeuristic(this.graph);
     }
 
     Node getRootNode() {
@@ -71,6 +72,53 @@ public class Graph {
                 addNodes(copyOfPS, copyOfNS, turn + 1, newNode);
             }
         }
+    }
+
+    // Ģenerē grafam heiristiskos novērtējumus
+    void generateHeuristic(Node currentNode) {
+        Queue<Node> winningNodes = new LinkedList<>();
+        findWinningEndStates(currentNode, winningNodes);
+        for (Node node : winningNodes) {
+            assignHeuristic(node);
+        }
+    }
+
+    // Atrod uzvarošās strupceļa virsotnes ar no datiem virzīto pārmeklēšanu dziļumā
+    void findWinningEndStates(Node currentNode, Queue<Node> winningNodes) {
+
+        if (currentNode.getChildren().isEmpty()) {
+            if(currentNode.getPlayerScores()[1] > currentNode.getPlayerScores()[0]) {
+                winningNodes.add(currentNode);
+            }
+            return;
+        }
+        for (Node node : currentNode.getChildren()) {
+            findWinningEndStates(node, winningNodes);
+        }
+    }
+
+    // Piešķir virsotnēm heiristiskos novērtējumus ar no mērķa virzīto pārmeklēšanu dziļumā
+    void assignHeuristic(Node currentNode) {
+        if (currentNode.getParent() != null) {
+            assignHeuristic(currentNode.getParent());
+        }
+
+        // Ja šī ir virsotne, kas radās datora gājiena rezultātā
+        if (currentNode.getTurn() % 2 != 0) {
+            currentNode.setHeuristic(heuristicFunction(currentNode));
+        }
+    }
+
+    // Definē heiristisko funkciju
+    int heuristicFunction(Node currentNode) {
+        int heuristic = 0;
+        int humanScore = currentNode.getPlayerScores()[0];
+        int computerScore = currentNode.getPlayerScores()[1];
+
+        heuristic += (computerScore - humanScore);
+
+        if (heuristic < 0) return 0;
+        return heuristic;
     }
 
 
