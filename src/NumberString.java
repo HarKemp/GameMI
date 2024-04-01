@@ -3,16 +3,26 @@ import java.util.List;
 import java.util.Random;
 
 public class NumberString{
-    private List<Integer> numberString;
+    private final List<Integer> numberString = new LinkedList<Integer>();
+
+    // Konstruktors
+    NumberString() {
+    }
 
     // Konstruktors - izveido nejauši ģenerētu skaitļu virkni
     NumberString(int length) {
         int upperLimit = 4; // Augstākais cipars, ko var uzģenerēt virknē
-        numberString = new LinkedList<Integer>();
         Random rand = new Random();
         for (int i = 0; i < length; i++) {
             int randomDigit = rand.nextInt(upperLimit) + 1;
             numberString.add(randomDigit);
+        }
+    }
+
+    // Konstruktors - pārveido statisku skaitļu virkni uz sarakstu (Vajadzīgs Node.java implementācijā)
+    NumberString (int[] staticArray) {
+        for(int i = 0; i < staticArray.length; i++) {
+            numberString.add(staticArray[i]);
         }
     }
 
@@ -25,6 +35,11 @@ public class NumberString{
     // Pievieno jaunu ciparu konkrētajā indeksā
     void addDigit(int index, int newDigit) {
         numberString.add(index, newDigit);
+    }
+
+    // Pievieno jaunu ciparu beigās
+    void addDigit(int newDigit) {
+        numberString.add(newDigit);
     }
 
     // Aizvieto ciparu konkrētajā indeksā
@@ -66,6 +81,18 @@ public class NumberString{
             array[i] = numberString.get(i);
         }
         return array;
+    }
+
+    NumberString createCopy() {
+        // Izveido kopiju katram vecā saraksta elementam
+        // Speciāli paredzēta, lai izveidotu kopijas katram elementam
+        // (lai nebūtu pārkopētas tikai atsauces uz elementiem)
+
+        NumberString newNumberString = new NumberString();
+        for (int i = 0; i < numberString.size(); i++) {
+            newNumberString.addDigit(numberString.get(i));
+        }
+        return newNumberString;
     }
 
 
