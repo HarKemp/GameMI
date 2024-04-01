@@ -2,8 +2,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Node {
-    private int[] playerScores;
-    private int[] numberString;
+    private final int[] playerScores;
+    private final int[] numberString;
     // Saraksts ar tiešajiem, šīs virsotnes, bērniem
     private final List<Node> childList = new LinkedList<>();
     // Saraksts ar tiešajiem, šīs virsotnes, vecākiem
