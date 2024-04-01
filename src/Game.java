@@ -101,8 +101,8 @@ public class Game {
                 bestEndNode = null;
             }
 
-            if (bestEndNode == null && activeNode != null)
-                bestEndNode = alphaBeta(activeNode, MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, playerMove != 0);
+            if (playerMove == 1 && bestEndNode == null && activeNode != null)
+                bestEndNode = alphaBeta(activeNode, MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
 
             //TODO TEST - Izvada grafu terminālī (Beigās jāizņem ārā no koda)
             if (this.mode == 1) {
