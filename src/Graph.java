@@ -4,15 +4,16 @@ import java.util.Queue;
 
 public class Graph {
     private int MAX_DEPTH;
-    private Node graph;
+    private final Node graph;
 
     Graph() {
         this.graph = null;
     }
 
-    Graph(int[] playerScores, NumberString numberString, int maxDepth) {
+    Graph(int[] playerScores, NumberString numberString, int maxDepth, int turn) {
         this.MAX_DEPTH = maxDepth;
-        createGraph(playerScores, numberString);
+        this.graph = new Node(playerScores, numberString, null, turn, 0);
+        addNodes(playerScores, numberString, this.graph);
         generateHeuristic(this.graph);
     }
 
@@ -20,15 +21,9 @@ public class Graph {
         return graph;
     }
 
-    private void createGraph(int[] playerScores, NumberString numberString) {
-        this.graph = new Node(playerScores, numberString, this.graph, 0);
-        int turn = 1;
-        addNodes(playerScores, numberString, turn, this.graph);
-    }
-
-    private Node createNewNode(NumberString numberString, int[] playerScores, Node parentNode, int turn) {
+    private Node createNewNode(NumberString numberString, int[] playerScores, Node parentNode, int turn, int move) {
         // Glabās pievienojamo virsotni
-        Node newNode = new Node(playerScores, numberString, parentNode, turn);
+        Node newNode = new Node(playerScores, numberString, parentNode, turn, move);
         parentNode.addChild(newNode);
         return newNode;
     }
@@ -39,13 +34,15 @@ public class Graph {
         return copyArray;
     }
 
-    private void addNodes(int[] playerScores, NumberString numberString, int turn, Node currentNode) {
+    private void addNodes(int[] playerScores, NumberString numberString, Node currentNode) {
         // Glabās pilnu kopiju skaitļu virknei
         NumberString copyOfNS;
         // Glabās pilnu kopiju spēlētāju punktu sadalījumam
         int[] copyOfPS;
 
-        if (turn > MAX_DEPTH) return;
+        int turn = currentNode.getTurn() + 1;
+
+        if ((turn - this.graph.getTurn()) > MAX_DEPTH) return;
 
         // Kuram jāveic gājiens?
         // Ja pāra gājiens, tad cilvēks
@@ -58,18 +55,18 @@ public class Graph {
             copyOfPS = copyOfArray(playerScores);
             // Ja ņem ciparu 1-4
             if (i < 5 && Move.takeNumber(copyOfNS, copyOfPS, currentPlayer, i)) {
-                Node newNode = createNewNode(copyOfNS, copyOfPS, currentNode, turn);
-                addNodes(copyOfPS, copyOfNS, turn + 1, newNode);
+                Node newNode = createNewNode(copyOfNS, copyOfPS, currentNode, turn, i);
+                addNodes(copyOfPS, copyOfNS, newNode);
             }
             // Ja dala 2
             else if (i == 5 && Move.splitNumber2(copyOfNS, copyOfPS, opponentPlayer)) {
-                Node newNode = createNewNode(copyOfNS, copyOfPS, currentNode, turn);
-                addNodes(copyOfPS, copyOfNS, turn + 1, newNode);
+                Node newNode = createNewNode(copyOfNS, copyOfPS, currentNode, turn, i);
+                addNodes(copyOfPS, copyOfNS, newNode);
             }
             // Ja dala 4
             else if (i == 6 && Move.splitNumber4(copyOfNS, copyOfPS, opponentPlayer)) {
-                Node newNode = createNewNode(copyOfNS, copyOfPS, currentNode, turn);
-                addNodes(copyOfPS, copyOfNS, turn + 1, newNode);
+                Node newNode = createNewNode(copyOfNS, copyOfPS, currentNode, turn, i);
+                addNodes(copyOfPS, copyOfNS, newNode);
             }
         }
     }
@@ -117,8 +114,7 @@ public class Graph {
 
         heuristic += (computerScore - humanScore);
 
-        if (heuristic < 0) return 0;
-        return heuristic;
+        return Math.max(heuristic, 0);
     }
 
 

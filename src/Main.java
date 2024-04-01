@@ -10,7 +10,10 @@ public class Main {
             System.out.println("If the graph MAX_DEPTH is larger than 5 - it is recommended to not use (1)");
             int mode = InputReader.getInt();
             if (mode != 1 && mode != 0) continue;
-            Game.startNewGame(mode);
+
+            Game game = new Game(mode);
+            game.startNewGame();
+
             System.out.println("\n\n\nDo you want to start a new game? (y/n)");
             if (InputReader.getChar() == 'y') continue;
             break;

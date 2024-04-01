@@ -5,22 +5,23 @@ public class Node {
     private int[] playerScores;
     private int[] numberString;
     // Saraksts ar tiešajiem, šīs virsotnes, bērniem
-    private final List<Node> childList = new LinkedList<Node>();
+    private final List<Node> childList = new LinkedList<>();
     // Saraksts ar tiešajiem, šīs virsotnes, vecākiem
-    private final List<Node> parentList = new LinkedList<Node>();
+    private final List<Node> parentList = new LinkedList<>();
 
     // Heiristiskās funkcijas novērtējums konkrētajai virsotnei
     // Noklusējumā -1 (ja šī virsotne nav izveidota datora gājiena rezultātā)
     private int heuristic = -1;
     // Relatīvi noteiktais gājiens pēc kārtas konkrētajā grafā
     private int turn;
+    private final int move;
 
-    Node () {}
-    Node (int[] playerScores, NumberString numberString, Node parent, int turn) {
+    Node (int[] playerScores, NumberString numberString, Node parent, int turn, int move) {
         this.playerScores = playerScores;
         this.numberString = numberString.convertToStaticArray();
         this.parentList.add(parent);
         this.turn = turn;
+        this.move = move;
         //generateHeuristic();
     }
 
@@ -29,9 +30,8 @@ public class Node {
         this.heuristic = this.playerScores[1] - this.playerScores[0];
     }
 
-    Node addChild(Node child) {
+    void addChild(Node child) {
         this.childList.add(child);
-        return child;
     }
 
     NumberString getNumberString() {
@@ -58,9 +58,22 @@ public class Node {
         return this.turn;
     }
 
+    int getMove() {
+        return this.move;
+    }
+
     // Atgriež konkrētu virsotnes bērnu
     Node getChild(int childIndex) {
         return childList.get(childIndex);
+    }
+
+    Node getChildWithMove(int move) {
+        for (Node node : childList) {
+            if (node.move == move) {
+                return node;
+            }
+        }
+        return null;
     }
 
     // Atgriež visu virsotnes bērnu sarakstu
@@ -73,7 +86,6 @@ public class Node {
     }
 
     Node getParent() {
-        return parentList.get(0);
+        return parentList.getFirst();
     }
-
 }
