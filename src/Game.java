@@ -1,9 +1,14 @@
-enum playerNames {
-    HUMAN,
-    COMPUTER
-}
+import Enums.AlgorithmType;
+import Enums.GameStatus;
+import Enums.Player;
+import Forms.PlayingForm;
+import Forms.StartForm;
+import Listeners.PlayingGameListener;
+import Listeners.StartGameListener;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Game {
+public class Game implements StartGameListener, PlayingGameListener {
 
     // Cik dziļu grafu ģenerēt - cik gājienus uz priekšu
     // Ja šo uzliks par dziļu, tad varbūt nokārsies programma
@@ -14,165 +19,149 @@ public class Game {
     static final private int VALID_TURNS = MAX_DEPTH - 2;
     private static final int LOWER_BOUND = 5; // Kad pabeigts jābūt 15
     private static final int UPPER_BOUND = 20; // Kad pabeigts jābūt 20
-    private final int mode;
+
+    private AlgorithmType algorithmType;
     private NumberString nS;
     private int[] playerScores;
-    private int playerMove = 0;
+    private Player playerMove;
+    private GameStatus status = GameStatus.Initialized;
+    private PlayingForm playingForm;
+    private StartForm startForm;
+    private int currentTurn;
+    private int generatedUntilTurn;
+    private Graph graph;
+    private Node activeNode = null;
+    private Node bestEndNode;
 
-    Game(int mode) {
-        this.mode = mode;
+    public void setPlayingForm(PlayingForm playingForm) {
+        this.playingForm = playingForm;
     }
 
-    void startNewGame() {
-        gameSetup();
-        play();
-        printResults();
+    public void setStartForm(StartForm startForm) {
+        this.startForm = startForm;
     }
 
-    private void gameSetup() {
-        setupPlayers();
-        setupNumberString();
-        determineFirstPlayer();
-    }
+    public void startNewGame(int length, Player firtPlayer, AlgorithmType algorithm) {
+        if (!isValidLength(length))
+            return;
 
-    private void setupPlayers() {
+        if (status != GameStatus.Initialized && status != GameStatus.Ended)
+            return;
+
+        status = GameStatus.Playing;
+
         // Izveido masīvu ar katra spēlētāja punktu skaitu
         int playerCount = 2;
         playerScores = new int[playerCount];
-    }
-
-    private void setupNumberString() {
-        // Noskaidro ciparu virknes garumu
-        int length;
-        System.out.print("Input number-string length: ");
-        while(true) {
-            length = InputReader.getInt();
-            if (length > UPPER_BOUND || length < LOWER_BOUND) {
-                System.out.println("Incorrectly defined number-string length");
-                System.out.print("Try again: ");
-                continue;
-            }
-            break;
-        }
 
         // Izveido ciparu virkni
         nS = new NumberString(length);
+
+        playerMove = firtPlayer;
+        algorithmType = algorithm;
+        currentTurn = 0;
+        generatedUntilTurn = 0;
+
+        PlayingForm playingForm = new PlayingForm(this, startForm);
+
+        playingForm.setStatus(nS.convertToString(), playerScores[0], playerScores[1], playerMove);
+
+        if (playerMove == Player.Computer)
+            takeTurn(-1);
     }
 
-    private void determineFirstPlayer() {
-        // Noskaidro kurš veiks pirmo gājiemu - cilvēks vai dators
-        System.out.println("Who is going to take the first turn?");
-        System.out.println("(c): Computer");
-        System.out.println("(h): Human");
-        char answer;
-        while(true) {
-            answer = InputReader.getChar();
-            if (answer != 'c' && answer != 'h') {
-                System.out.println("input-output error");
-                System.out.print("Try again: ");
-                continue;
-            }
-            break;
+    public boolean isValidLength(int length) {
+        return LOWER_BOUND <= length && length <= UPPER_BOUND;
+    }
+
+    public boolean takeTurn(int move) {
+        if (status != GameStatus.Playing)
+            return false;
+
+        //Ģenerē grafu
+        if (generatedUntilTurn <= currentTurn) {
+            generatedUntilTurn = currentTurn + VALID_TURNS;
+            graph = new Graph(playerScores, nS, MAX_DEPTH, currentTurn);
+            activeNode = graph.getRootNode();
+            generateBestEndNode();
         }
 
-        // Ja atbilde ir c, tad sāk dators (pagaidām spēlē identificē kā "Player 2", vēlāk var uztaisīt lai identificētu kā "dators").
-        // Ja atbilde ir h, tad sāk cilvēks (pagaidām spēlē identificē kā "Player 1", vēlāk var uztaisīt lai identificētu kā "spēlētājs")
-        if (answer == 'c') playerMove = 1;
-    }
+        if (playerMove == Player.Human){
+            if (takeMove(move))
+                return false;
 
-    private void play() {
-        // Nosaka pašreizējo gājienu
-        int currentTurn = 0;
-        // Nosaka gājienu līdz kuram ir derīgs pašlaik uzģenerētais grafs
-        int generatedUntilTurn = 0;
-        // Uztaisa tukšu grafu kā placeholder
-        Graph graph = new Graph();
+            activeNode = activeNode.getChildWithMove(move);
+        }
+        else {
+            Node bestMove = getBestMove();
 
-        Node activeNode = null;
-        Node bestEndNode = null;
-
-        // Pilda gājienus līdz simbolu virkne ir tukša
-        while(!nS.isEmpty()) {
-            // Ģenerē grafu
-            if (generatedUntilTurn <= currentTurn) {
-                generatedUntilTurn = currentTurn + VALID_TURNS;
-                graph = new Graph(playerScores, nS, MAX_DEPTH, currentTurn);
-                activeNode = graph.getRootNode();
-                bestEndNode = null;
+            if (activeNode != bestMove.getParent()) {
+                generateBestEndNode();
+                bestMove = getBestMove();
             }
 
-            if (playerMove == 1 && bestEndNode == null && activeNode != null)
-                bestEndNode = alphaBeta(activeNode, MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+            if (takeMove(bestMove.getMove()))
+                return false;
 
-            //TODO TEST - Izvada grafu terminālī (Beigās jāizņem ārā no koda)
-            if (this.mode == 1) {
-                graph.printGraph(VALID_TURNS - (generatedUntilTurn - currentTurn));
-            }
-
-            // Ja gājiena izpildes laikā notika kļūda (visdrīzāk ar ievadi), tad gājienu veic vēlreiz
-            if (playerMove == 0){
-                Node move = takeHumanTurn(activeNode);
-
-                if(null == move)
-                    continue;
-                else
-                    activeNode = move;
-            }
-            else {
-                Node bestMove = bestEndNode;
-
-                while(bestMove.getTurn() != (currentTurn + 1))
-                    bestMove = bestMove.getParent();
-
-                if (activeNode != bestMove.getParent()) {
-                    bestEndNode = null;
-                    continue;
-                }
-
-                Node move = takeComputerTurn(bestMove);
-
-                if(null == move)
-                    continue;
-                else
-                    activeNode = move;
-            }
-
-            // Pāriet uz nākamā spēlētāja gājienu
-            playerMove = playerMove == 0 ? 1 : 0;
-            currentTurn++;
+            activeNode = bestMove;
         }
 
+        playerMove = getOponentPlayer();
+        currentTurn++;
+
+        playingForm.setStatus(nS.convertToString(), playerScores[0], playerScores[1], playerMove);
+
+        if (nS.isEmpty()) {
+            status = GameStatus.Ended;
+            printResults();
+        }
+
+        return true;
     }
 
-    private Node takeComputerTurn(Node bestMove) {
-        printStatus();
+    private Node getBestMove() {
+        Node bestMove = bestEndNode;
 
-        int opponentPlayer =  playerMove == 0 ? 1 : 0;
+        while(bestMove.getTurn() != (currentTurn + 1))
+            bestMove = bestMove.getParent();
 
-        switch (bestMove.getMove()) {
+        return bestMove;
+    }
+
+    private void generateBestEndNode() {
+        if (activeNode == null)
+            return;
+
+        bestEndNode = alphaBeta(activeNode, MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+    }
+
+    private boolean takeMove(int move) {
+        Player opponentPlayer = getOponentPlayer();
+
+        switch (move) {
             case 1:
             case 2:
             case 3:
             case 4:
-                if(!Move.takeNumber(nS, playerScores, playerMove, bestMove.getMove())) {
-                    return null;
+                if(!Move.takeNumber(nS, playerScores, playerMove.getValue(), move)) {
+                    return true;
                 }
                 break;
             case 5:
-                if (!Move.splitNumber2(nS, playerScores, opponentPlayer)) {
-                    return null;
+                if (!Move.splitNumber2(nS, playerScores, opponentPlayer.getValue())) {
+                    return true;
                 }
                 break;
             case 6:
-                if (!Move.splitNumber4(nS, playerScores, opponentPlayer)) {
-                    return null;
+                if (!Move.splitNumber4(nS, playerScores, opponentPlayer.getValue())) {
+                    return true;
                 }
                 break;
             default:
-                return null;
+                return true;
         }
 
-        return bestMove;
+        return false;
     }
 
     private Node alphaBeta(Node node, int depth, int alpha, int beta, boolean maximizingPlayer) {
@@ -218,76 +207,31 @@ public class Game {
         return bestNode;
     }
 
-    private Node takeHumanTurn(Node activeNode) {
-        printStatus();
-
-        // Veic gājienu
-        System.out.println("Choose move:");
-        System.out.println("(t): Take a number ");
-        System.out.println("(2): Split a Two");
-        System.out.println("(4): Split a Four");
-        char answer = InputReader.getChar();
-        int opponentPlayer;
-        int move;
-        switch (answer) {
-            case 't':
-                System.out.print("Input number you want to take: ");
-                int number = InputReader.getInt();
-                move = number;
-                if (!Move.takeNumber(nS, playerScores, playerMove, number)) {
-                    System.out.println("No " + number + "s in the string");
-                    return null;
-                }
-                break;
-            case '2':
-                opponentPlayer = playerMove == 0 ? 1 : 0;
-                move = 5;
-                if (!Move.splitNumber2(nS, playerScores, opponentPlayer)) {
-                    System.out.println("No twos in the string");
-                    return null;
-                }
-                break;
-            case '4':
-                opponentPlayer = playerMove == 0 ? 1 : 0;
-                move = 6;
-                if (!Move.splitNumber4(nS, playerScores, opponentPlayer)) {
-                    System.out.println("No fours in the string");
-                    return null;
-                }
-                break;
-            default:
-                System.out.println("input-output error");
-                return null;
-        }
-
-        return activeNode.getChildWithMove(move);
-    }
-
-    private void printStatus() {
-        System.out.println("==========================================");
-        System.out.println("Numbers: " + nS.convertToString());
-        System.out.println(playerNames.HUMAN + " points: " + playerScores[0]);
-        System.out.println(playerNames.COMPUTER + " points: " + playerScores[1]);
-        System.out.println("==========================================");
-        if (playerMove == 0)
-            System.out.println(playerNames.HUMAN + " move!");
-        else
-            System.out.println(playerNames.COMPUTER + " move!");
-    }
-
     private void printResults() {
-        // Izvada spēles rezultātus
-        System.out.println("Game over!");
-        System.out.println(playerNames.HUMAN + " points: " + playerScores[0]);
-        System.out.println(playerNames.COMPUTER + " points: " + playerScores[1]);
-        if (playerScores[0] == playerScores[1]) {
-            System.out.println("It's a tie!");
+        if (status != GameStatus.Ended)
             return;
+
+        List<Player> winners = new ArrayList<>();
+        int maxScore = Integer.MIN_VALUE;
+
+        for (int score : playerScores) {
+            if (score > maxScore) {
+                maxScore = score;
+            }
         }
-        if (playerScores[0] > playerScores[1])
-            System.out.println(playerNames.HUMAN + " wins");
-        else
-            System.out.println(playerNames.COMPUTER + " wins");
+
+        for (Player player : Player.values()) {
+            int ix = player.getValue();
+            if (playerScores[ix] == maxScore) {
+                winners.add(player);
+            }
+        }
+
+        playingForm.setResults(winners.toArray(new Player[0]));
+    }
+
+    private Player getOponentPlayer() {
+        return playerMove == Player.Human ? Player.Computer : Player.Human;
     }
 }
 
