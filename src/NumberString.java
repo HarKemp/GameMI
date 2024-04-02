@@ -3,7 +3,7 @@ import java.util.List;
 import java.util.Random;
 
 public class NumberString{
-    private final List<Integer> numberString = new LinkedList<Integer>();
+    private final List<Integer> numberString = new LinkedList<>();
 
     // Konstruktors
     NumberString() {
@@ -21,8 +21,8 @@ public class NumberString{
 
     // Konstruktors - pārveido statisku skaitļu virkni uz sarakstu (Vajadzīgs Node.java implementācijā)
     NumberString (int[] staticArray) {
-        for(int i = 0; i < staticArray.length; i++) {
-            numberString.add(staticArray[i]);
+        for (int j : staticArray) {
+            numberString.add(j);
         }
     }
 
@@ -67,8 +67,8 @@ public class NumberString{
     // Pārveido ciparu virkni par String
     String convertToString() {
         StringBuilder sB = new StringBuilder();
-        for (int i = 0; i < numberString.size(); i++) {
-            sB.append(numberString.get(i));
+        for (Integer integer : numberString) {
+            sB.append(integer);
             sB.append(" ");
         }
         return sB.toString();
@@ -89,8 +89,8 @@ public class NumberString{
         // (lai nebūtu pārkopētas tikai atsauces uz elementiem)
 
         NumberString newNumberString = new NumberString();
-        for (int i = 0; i < numberString.size(); i++) {
-            newNumberString.addDigit(numberString.get(i));
+        for (Integer integer : numberString) {
+            newNumberString.addDigit(integer);
         }
         return newNumberString;
     }
