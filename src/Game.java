@@ -30,7 +30,7 @@ public class Game implements StartGameListener, PlayingGameListener {
     private int currentTurn;
     private int generatedUntilTurn;
     private Graph graph;
-    private Node activeNode = null;
+    private Node activeNode;
     private Node bestEndNode;
 
     public void setPlayingForm(PlayingForm playingForm) {
@@ -83,7 +83,6 @@ public class Game implements StartGameListener, PlayingGameListener {
             generatedUntilTurn = currentTurn + VALID_TURNS;
             graph = new Graph(playerScores, nS, MAX_DEPTH, currentTurn);
             activeNode = graph.getRootNode();
-            generateBestEndNode();
         }
 
         if (playerMove == Player.Human){
@@ -96,7 +95,7 @@ public class Game implements StartGameListener, PlayingGameListener {
             Node bestMove = getBestMove();
 
             if (activeNode != bestMove.getParent()) {
-                generateBestEndNode();
+                bestEndNode = null;
                 bestMove = getBestMove();
             }
 
@@ -111,6 +110,9 @@ public class Game implements StartGameListener, PlayingGameListener {
 
         playingForm.setStatus(nS.convertToString(), playerScores[0], playerScores[1], playerMove);
 
+        //TODO remove
+        //graph.printGraph(VALID_TURNS - (generatedUntilTurn - currentTurn));
+
         if (nS.isEmpty()) {
             status = GameStatus.Ended;
             printResults();
@@ -120,6 +122,9 @@ public class Game implements StartGameListener, PlayingGameListener {
     }
 
     private Node getBestMove() {
+        if (bestEndNode == null)
+            generateBestEndNode();
+
         Node bestMove = bestEndNode;
 
         while(bestMove.getTurn() != (currentTurn + 1))
@@ -129,10 +134,10 @@ public class Game implements StartGameListener, PlayingGameListener {
     }
 
     private void generateBestEndNode() {
-        if (activeNode == null)
-            return;
-
-        bestEndNode = alphaBeta(activeNode, MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+        if (algorithmType == AlgorithmType.AlphaBeta)
+            bestEndNode = alphaBeta(activeNode, MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+        else
+            bestEndNode = minimax(activeNode, MAX_DEPTH, true);
     }
 
     private boolean takeMove(int move) {
@@ -202,6 +207,40 @@ public class Game implements StartGameListener, PlayingGameListener {
                 }
             }
 
+        }
+
+        return bestNode;
+    }
+
+    private Node minimax(Node node, int depth, boolean maximizingPlayer) {
+        if (depth == 0 || node.getChildren().isEmpty()) {
+            return node;
+        }
+
+        Node bestNode = null;
+        Node resultNode;
+        int value;
+
+        if (maximizingPlayer) {
+            value = Integer.MIN_VALUE;
+            for (Node child : node.getChildren()) {
+                resultNode = minimax(child, depth - 1, false);
+                if (resultNode.getHeuristic() > value) {
+                    value = resultNode.getHeuristic();
+                    bestNode = resultNode;
+                }
+                node.setHeuristic(value);
+            }
+        } else {
+            value = Integer.MAX_VALUE;
+            for (Node child : node.getChildren()) {
+                resultNode = minimax(child, depth - 1, true);
+                if (resultNode.getHeuristic() < value) {
+                    value = resultNode.getHeuristic();
+                    bestNode = resultNode;
+                }
+                node.setHeuristic(value);
+            }
         }
 
         return bestNode;

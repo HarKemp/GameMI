@@ -9,9 +9,8 @@ public class Node {
     // Saraksts ar tiešajiem, šīs virsotnes, vecākiem
     private final List<Node> parentList = new LinkedList<>();
 
-    // Heiristiskās funkcijas novērtējums konkrētajai virsotnei
-    // Noklusējumā -1 (ja šī virsotne nav izveidota datora gājiena rezultātā)
-    private int heuristic = -1;
+    // Noklusējumā visszemākais iespējamais int vērtējums (ja šī virsotne nav gala virsotne)
+    private int heuristic = Integer.MIN_VALUE;
     // Relatīvi noteiktais gājiens pēc kārtas konkrētajā grafā
     private int turn;
     private final int move;

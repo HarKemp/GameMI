@@ -73,37 +73,29 @@ public class Graph {
 
     // Ģenerē grafam heiristiskos novērtējumus
     void generateHeuristic(Node currentNode) {
-        Queue<Node> winningNodes = new LinkedList<>();
-        findWinningEndStates(currentNode, winningNodes);
-        for (Node node : winningNodes) {
+        Queue<Node> endNodes = new LinkedList<>();
+        findEndStates(currentNode, endNodes);
+        for (Node node : endNodes) {
             assignHeuristic(node);
         }
     }
 
     // Atrod uzvarošās strupceļa virsotnes ar no datiem virzīto pārmeklēšanu dziļumā
-    void findWinningEndStates(Node currentNode, Queue<Node> winningNodes) {
-
+    void findEndStates(Node currentNode, Queue<Node> endNodes) {
         if (currentNode.getChildren().isEmpty()) {
-            if(currentNode.getPlayerScores()[1] > currentNode.getPlayerScores()[0]) {
-                winningNodes.add(currentNode);
-            }
+            endNodes.add(currentNode);
             return;
         }
+
         for (Node node : currentNode.getChildren()) {
-            findWinningEndStates(node, winningNodes);
+            findEndStates(node, endNodes);
         }
     }
 
     // Piešķir virsotnēm heiristiskos novērtējumus ar no mērķa virzīto pārmeklēšanu dziļumā
     void assignHeuristic(Node currentNode) {
-        if (currentNode.getParent() != null) {
-            assignHeuristic(currentNode.getParent());
-        }
-
-        // Ja šī ir virsotne, kas radās datora gājiena rezultātā
-        if (currentNode.getTurn() % 2 != 0) {
-            currentNode.setHeuristic(heuristicFunction(currentNode));
-        }
+        // Gala virsotnei piešķir heiristisko novērtējumu
+        currentNode.setHeuristic(heuristicFunction(currentNode));
     }
 
     // Definē heiristisko funkciju
@@ -113,8 +105,9 @@ public class Graph {
         int computerScore = currentNode.getPlayerScores()[1];
 
         heuristic += (computerScore - humanScore);
+        heuristic -= currentNode.getTurn();
 
-        return Math.max(heuristic, 0);
+        return heuristic;
     }
 
 
