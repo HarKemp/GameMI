@@ -67,7 +67,6 @@ public class Game implements StartGameListener, PlayingGameListener {
 
         playingForm.setStatus(nS.convertToString(), playerScores[0], playerScores[1], playerMove);
 
-        //TODO Ko šitas dara?
         if (playerMove == Player.Computer)
             takeTurn(-1);
     }

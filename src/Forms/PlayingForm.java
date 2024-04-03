@@ -294,8 +294,8 @@ public class PlayingForm extends JFrame {
     public void setResults(Player[] winners) {
         if (winners.length > 1)
             InfoLabel.setText("It's a tie!");
-
-        InfoLabel.setText(winners[0] + " wins!");
+        else
+            InfoLabel.setText(winners[0] + " wins!");
 
         ButtonPanel.setVisible(true);
         HistoryPanel.setVisible(true);
