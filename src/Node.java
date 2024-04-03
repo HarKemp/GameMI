@@ -85,6 +85,6 @@ public class Node {
     }
 
     Node getParent() {
-        return parentList.getFirst();
+        return parentList.get(0);
     }
 }

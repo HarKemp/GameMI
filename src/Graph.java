@@ -10,10 +10,10 @@ public class Graph {
         this.graph = null;
     }
 
-    Graph(int[] playerScores, NumberString numberString, int maxDepth, int turn) {
+    Graph(int[] playerScores, NumberString numberString, int maxDepth, int turn, int playerMove) {
         this.MAX_DEPTH = maxDepth;
         this.graph = new Node(playerScores, numberString, null, turn, 0);
-        addNodes(playerScores, numberString, this.graph);
+        addNodes(playerScores, numberString, this.graph, playerMove);
         generateHeuristic(this.graph);
     }
 
@@ -34,7 +34,7 @@ public class Graph {
         return copyArray;
     }
 
-    private void addNodes(int[] playerScores, NumberString numberString, Node currentNode) {
+    private void addNodes(int[] playerScores, NumberString numberString, Node currentNode, int playerMove) {
         // Glabās pilnu kopiju skaitļu virknei
         NumberString copyOfNS;
         // Glabās pilnu kopiju spēlētāju punktu sadalījumam
@@ -44,11 +44,9 @@ public class Graph {
 
         if ((turn - this.graph.getTurn()) > MAX_DEPTH) return;
 
-        // Kuram jāveic gājiens?
-        // Ja pāra gājiens, tad cilvēks
-        // Ja nepāra gājiens, tad dators
-        int currentPlayer = (turn % 2) == 0 ? 0 : 1;
-        int opponentPlayer = (turn % 2) == 0 ? 1 : 0;
+        // Nosaka kuram jāveic gājiens
+        int currentPlayer = playerMove == 0 ? 0 : 1;
+        int opponentPlayer = playerMove == 0 ? 1 : 0;
 
         for (int i = 1; i < 7; i++) {
             copyOfNS = numberString.createCopy();
@@ -56,17 +54,17 @@ public class Graph {
             // Ja ņem ciparu 1-4
             if (i < 5 && Move.takeNumber(copyOfNS, copyOfPS, currentPlayer, i)) {
                 Node newNode = createNewNode(copyOfNS, copyOfPS, currentNode, turn, i);
-                addNodes(copyOfPS, copyOfNS, newNode);
+                addNodes(copyOfPS, copyOfNS, newNode, (playerMove == 0 ? 1 : 0));
             }
             // Ja dala 2
             else if (i == 5 && Move.splitNumber2(copyOfNS, copyOfPS, opponentPlayer)) {
                 Node newNode = createNewNode(copyOfNS, copyOfPS, currentNode, turn, i);
-                addNodes(copyOfPS, copyOfNS, newNode);
+                addNodes(copyOfPS, copyOfNS, newNode, (playerMove == 0 ? 1 : 0));
             }
             // Ja dala 4
             else if (i == 6 && Move.splitNumber4(copyOfNS, copyOfPS, opponentPlayer)) {
                 Node newNode = createNewNode(copyOfNS, copyOfPS, currentNode, turn, i);
-                addNodes(copyOfPS, copyOfNS, newNode);
+                addNodes(copyOfPS, copyOfNS, newNode, (playerMove == 0 ? 1 : 0));
             }
         }
     }
@@ -105,7 +103,10 @@ public class Graph {
         int computerScore = currentNode.getPlayerScores()[1];
 
         heuristic += (computerScore - humanScore);
-        heuristic -= currentNode.getTurn();
+//        heuristic -= currentNode.getTurn();
+        if (currentNode.getMove() <= 4) {
+            heuristic += (currentNode.getMove() * 10);
+        }
 
         return heuristic;
     }

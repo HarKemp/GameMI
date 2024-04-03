@@ -41,7 +41,7 @@ public class Game implements StartGameListener, PlayingGameListener {
         this.startForm = startForm;
     }
 
-    public void startNewGame(int length, Player firtPlayer, AlgorithmType algorithm) {
+    public void startNewGame(int length, Player firstPlayer, AlgorithmType algorithm) {
         if (!isValidLength(length))
             return;
 
@@ -57,7 +57,8 @@ public class Game implements StartGameListener, PlayingGameListener {
         // Izveido ciparu virkni
         nS = new NumberString(length);
 
-        playerMove = firtPlayer;
+        bestEndNode = null;
+        playerMove = firstPlayer;
         algorithmType = algorithm;
         currentTurn = 0;
         generatedUntilTurn = 0;
@@ -66,6 +67,7 @@ public class Game implements StartGameListener, PlayingGameListener {
 
         playingForm.setStatus(nS.convertToString(), playerScores[0], playerScores[1], playerMove);
 
+        //TODO Ko šitas dara?
         if (playerMove == Player.Computer)
             takeTurn(-1);
     }
@@ -81,14 +83,13 @@ public class Game implements StartGameListener, PlayingGameListener {
         //Ģenerē grafu
         if (generatedUntilTurn <= currentTurn) {
             generatedUntilTurn = currentTurn + VALID_TURNS;
-            graph = new Graph(playerScores, nS, MAX_DEPTH, currentTurn);
+            graph = new Graph(playerScores, nS, MAX_DEPTH, currentTurn, playerMove.getValue());
             activeNode = graph.getRootNode();
         }
 
         if (playerMove == Player.Human){
             if (takeMove(move))
                 return false;
-
             activeNode = activeNode.getChildWithMove(move);
         }
         else {
