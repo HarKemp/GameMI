@@ -295,15 +295,5 @@ public class Game implements StartGameListener, PlayingGameListener {
     private Player getOponentPlayer() {
         return playerMove == Player.Human ? Player.Computer : Player.Human;
     }
-
-    int getVisitedNodeCount() {
-        return visitedNodeCount;
-    }
-    int getGeneratedNodeCount() {
-        return generatedNodeCount;
-    }
-    int getGraphNodeCount() {
-        return graphNodeCount;
-    }
 }
 
