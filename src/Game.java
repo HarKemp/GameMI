@@ -33,6 +33,13 @@ public class Game implements StartGameListener, PlayingGameListener {
     private Node activeNode;
     private Node bestEndNode;
 
+    // Nosaka cik virsotnes pa visam tika ģenerētas ar grafa veidošanas algoritmu
+    private int generatedNodeCount;
+    // Nosaka cik lietderīgas/unikālas virsotnes tika ģenerētas
+    private int graphNodeCount;
+    // Nosaka cik virsotnes tika apmeklētas ar izvēlēto algoritmu
+    private int visitedNodeCount;
+
     public void setPlayingForm(PlayingForm playingForm) {
         this.playingForm = playingForm;
     }
@@ -56,6 +63,11 @@ public class Game implements StartGameListener, PlayingGameListener {
 
         // Izveido ciparu virkni
         nS = new NumberString(length);
+
+        generatedNodeCount = 0;
+        // Viens apzīmē sākotnējo (saknes) virsotni
+        graphNodeCount = 1;
+        visitedNodeCount = 0;
 
         bestEndNode = null;
         playerMove = firstPlayer;
@@ -84,7 +96,11 @@ public class Game implements StartGameListener, PlayingGameListener {
             generatedUntilTurn = currentTurn + VALID_TURNS;
             graph = new Graph(playerScores, nS, MAX_DEPTH, currentTurn, playerMove.getValue());
             activeNode = graph.getRootNode();
+            generatedNodeCount += graph.getNodeCount();
         }
+
+        // Pieskaita kopējam virsotņu skaitam visu NĀKAMĀ līmeņa virsotņu skaitu
+        graphNodeCount += activeNode.getChildren().size();
 
         if (playerMove == Player.Human){
             if (takeMove(move))
@@ -107,7 +123,6 @@ public class Game implements StartGameListener, PlayingGameListener {
 
         playerMove = getOponentPlayer();
         currentTurn++;
-
         playingForm.setStatus(nS.convertToString(), playerScores[0], playerScores[1], playerMove);
 
         //TODO remove
@@ -170,6 +185,9 @@ public class Game implements StartGameListener, PlayingGameListener {
     }
 
     private Node alphaBeta(Node node, int depth, int alpha, int beta, boolean maximizingPlayer) {
+
+        visitedNodeCount++;
+
         if (depth == 0 || node.getChildren().isEmpty()) {
             return node;
         }
@@ -213,6 +231,9 @@ public class Game implements StartGameListener, PlayingGameListener {
     }
 
     private Node minimax(Node node, int depth, boolean maximizingPlayer) {
+
+        visitedNodeCount++;
+
         if (depth == 0 || node.getChildren().isEmpty()) {
             return node;
         }
@@ -271,6 +292,16 @@ public class Game implements StartGameListener, PlayingGameListener {
 
     private Player getOponentPlayer() {
         return playerMove == Player.Human ? Player.Computer : Player.Human;
+    }
+
+    int getVisitedNodeCount() {
+        return visitedNodeCount;
+    }
+    int getGeneratedNodeCount() {
+        return generatedNodeCount;
+    }
+    int getGraphNodeCount() {
+        return graphNodeCount;
     }
 }
 

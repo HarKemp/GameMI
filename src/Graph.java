@@ -5,12 +5,15 @@ import java.util.Queue;
 public class Graph {
     private int MAX_DEPTH;
     private final Node graph;
+    private int nodeCount;
 
     Graph() {
         this.graph = null;
     }
 
     Graph(int[] playerScores, NumberString numberString, int maxDepth, int turn, int playerMove) {
+        // šeit viens apzīmē saknes virsotni kokā
+        this.nodeCount = 1;
         this.MAX_DEPTH = maxDepth;
         this.graph = new Node(playerScores, numberString, null, turn, 0);
         addNodes(playerScores, numberString, this.graph, playerMove);
@@ -54,16 +57,19 @@ public class Graph {
             // Ja ņem ciparu 1-4
             if (i < 5 && Move.takeNumber(copyOfNS, copyOfPS, currentPlayer, i)) {
                 Node newNode = createNewNode(copyOfNS, copyOfPS, currentNode, turn, i);
+                nodeCount++;
                 addNodes(copyOfPS, copyOfNS, newNode, (playerMove == 0 ? 1 : 0));
             }
             // Ja dala 2
             else if (i == 5 && Move.splitNumber2(copyOfNS, copyOfPS, opponentPlayer)) {
                 Node newNode = createNewNode(copyOfNS, copyOfPS, currentNode, turn, i);
+                nodeCount++;
                 addNodes(copyOfPS, copyOfNS, newNode, (playerMove == 0 ? 1 : 0));
             }
             // Ja dala 4
             else if (i == 6 && Move.splitNumber4(copyOfNS, copyOfPS, opponentPlayer)) {
                 Node newNode = createNewNode(copyOfNS, copyOfPS, currentNode, turn, i);
+                nodeCount++;
                 addNodes(copyOfPS, copyOfNS, newNode, (playerMove == 0 ? 1 : 0));
             }
         }
@@ -102,13 +108,18 @@ public class Graph {
         int humanScore = currentNode.getPlayerScores()[0];
         int computerScore = currentNode.getPlayerScores()[1];
 
+        heuristic += computerScore;
         heuristic += (computerScore - humanScore);
 //        heuristic -= currentNode.getTurn();
         if (currentNode.getMove() <= 4) {
-            heuristic += (currentNode.getMove() * 10);
+            heuristic += (currentNode.getMove() * 2);
         }
 
         return heuristic;
+    }
+
+    int getNodeCount() {
+        return nodeCount;
     }
 
 
