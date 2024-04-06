@@ -77,7 +77,8 @@ public class Game implements StartGameListener, PlayingGameListener {
 
         PlayingForm playingForm = new PlayingForm(this, startForm);
 
-        playingForm.setStatus(nS.convertToString(), playerScores[0], playerScores[1], playerMove);
+        playingForm.setStatus(nS.convertToString(), playerScores[0], playerScores[1], playerMove, 0,
+                visitedNodeCount, generatedNodeCount, graphNodeCount);
 
         if (playerMove == Player.Computer)
             takeTurn(-1);
@@ -90,6 +91,8 @@ public class Game implements StartGameListener, PlayingGameListener {
     public boolean takeTurn(int move) {
         if (status != GameStatus.Playing)
             return false;
+
+        long startTime = System.nanoTime();
 
         //Ģenerē grafu
         if (generatedUntilTurn <= currentTurn) {
@@ -123,10 +126,9 @@ public class Game implements StartGameListener, PlayingGameListener {
 
         playerMove = getOponentPlayer();
         currentTurn++;
-        playingForm.setStatus(nS.convertToString(), playerScores[0], playerScores[1], playerMove);
 
-        //TODO remove
-        //graph.printGraph(VALID_TURNS - (generatedUntilTurn - currentTurn));
+        playingForm.setStatus(nS.convertToString(), playerScores[0], playerScores[1], playerMove,
+                System.nanoTime() - startTime, visitedNodeCount, generatedNodeCount, graphNodeCount);
 
         if (nS.isEmpty()) {
             status = GameStatus.Ended;

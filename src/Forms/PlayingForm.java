@@ -46,6 +46,15 @@ public class PlayingForm extends JFrame {
     private JLabel NumberStringTextLabel;
     private JLabel ComputerScoreTextLabel;
     private JLabel HumanScoreTextLabel;
+    private DefaultListModel<String> TurnTimeHistoryListModel;
+    private JList<String> TurnTimeHistoryList;
+    private DefaultListModel<String> NodeHistoryListModel;
+    private JList<String> NodeHistoryList;
+    private JScrollPane TurnTimeHistoryListPane;
+    private JScrollPane NodeHistoryListPane;
+    private JButton ShowHideStatisticsButton;
+    private JLabel NodeHistoryListPaneLabel;
+    private JLabel TurnTimeHistoryListPaneLabel;
     private PlayingGameListener listener;
     private Player playerMove = null;
 
@@ -71,8 +80,20 @@ public class PlayingForm extends JFrame {
         PlayerMoveHistoryListModel = new DefaultListModel<>();
         PlayerMoveHistoryList.setModel(PlayerMoveHistoryListModel);
 
+        TurnTimeHistoryListModel = new DefaultListModel<>();
+        TurnTimeHistoryList.setModel(TurnTimeHistoryListModel);
+
+        NodeHistoryListModel = new DefaultListModel<>();
+        NodeHistoryList.setModel(NodeHistoryListModel);
+
         HistoryPanel.setVisible(false);
         HistoryLabel.setVisible(false);
+        ShowHideStatisticsButton.setVisible(false);
+
+        TurnTimeHistoryListPane.setVisible(false);
+        NodeHistoryListPane.setVisible(false);
+        NodeHistoryListPaneLabel.setVisible(false);
+        TurnTimeHistoryListPaneLabel.setVisible(false);
 
         ButtonPanel.setVisible(false);
 
@@ -83,6 +104,7 @@ public class PlayingForm extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 HistoryLabel.setVisible(!HistoryLabel.isVisible());
                 HistoryPanel.setVisible(!HistoryPanel.isVisible());
+                ShowHideStatisticsButton.setVisible(!ShowHideStatisticsButton.isVisible());
 
                 ShowHideHistoryButton.setText(HistoryPanel.isVisible() ? "Hide history" : "Show history");
             }
@@ -94,7 +116,10 @@ public class PlayingForm extends JFrame {
                 if (playerMove != Player.Human)
                     return;
 
-                listener.takeTurn(5);
+                if (!listener.takeTurn(5)) {
+                    JOptionPane.showMessageDialog(PlayingForm.this, ErrorMessage.NUMBER_IN_STRING_DOESNT_EXIST, "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
                 //Datora gājiens
                 listener.takeTurn(-1);
@@ -107,7 +132,10 @@ public class PlayingForm extends JFrame {
                 if (playerMove != Player.Human)
                     return;
 
-                listener.takeTurn(6);
+                if (!listener.takeTurn(6)) {
+                    JOptionPane.showMessageDialog(PlayingForm.this, ErrorMessage.NUMBER_IN_STRING_DOESNT_EXIST, "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
                 //Datora gājiens
                 listener.takeTurn(-1);
@@ -214,6 +242,40 @@ public class PlayingForm extends JFrame {
             }
         });
 
+        NodeHistoryListModel.addListDataListener(new ListDataListener() {
+            @Override
+            public void intervalAdded(ListDataEvent e) {
+                scrollPaneToBottom(NodeHistoryListPane, NodeHistoryList, NodeHistoryListModel);
+            }
+
+            @Override
+            public void intervalRemoved(ListDataEvent e) {
+
+            }
+
+            @Override
+            public void contentsChanged(ListDataEvent e) {
+
+            }
+        });
+
+        TurnTimeHistoryListModel.addListDataListener(new ListDataListener() {
+            @Override
+            public void intervalAdded(ListDataEvent e) {
+                scrollPaneToBottom(TurnTimeHistoryListPane, TurnTimeHistoryList, TurnTimeHistoryListModel);
+            }
+
+            @Override
+            public void intervalRemoved(ListDataEvent e) {
+
+            }
+
+            @Override
+            public void contentsChanged(ListDataEvent e) {
+
+            }
+        });
+
         HumanHistoryScoreListPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
             public void adjustmentValueChanged(AdjustmentEvent e) {
                 int value = e.getValue();
@@ -221,6 +283,8 @@ public class PlayingForm extends JFrame {
                 NumberStringHistoryListPane.getVerticalScrollBar().setValue(value);
                 ComputerHistoryScoreListPane.getVerticalScrollBar().setValue(value);
                 PlayerMoveHistoryListPane.getVerticalScrollBar().setValue(value);
+                NodeHistoryListPane.getVerticalScrollBar().setValue(value);
+                TurnTimeHistoryListPane.getVerticalScrollBar().setValue(value);
             }
         });
 
@@ -231,6 +295,8 @@ public class PlayingForm extends JFrame {
                 HumanHistoryScoreListPane.getVerticalScrollBar().setValue(value);
                 ComputerHistoryScoreListPane.getVerticalScrollBar().setValue(value);
                 PlayerMoveHistoryListPane.getVerticalScrollBar().setValue(value);
+                NodeHistoryListPane.getVerticalScrollBar().setValue(value);
+                TurnTimeHistoryListPane.getVerticalScrollBar().setValue(value);
             }
         });
 
@@ -241,6 +307,8 @@ public class PlayingForm extends JFrame {
                 HumanHistoryScoreListPane.getVerticalScrollBar().setValue(value);
                 NumberStringHistoryListPane.getVerticalScrollBar().setValue(value);
                 PlayerMoveHistoryListPane.getVerticalScrollBar().setValue(value);
+                NodeHistoryListPane.getVerticalScrollBar().setValue(value);
+                TurnTimeHistoryListPane.getVerticalScrollBar().setValue(value);
             }
         });
 
@@ -251,6 +319,32 @@ public class PlayingForm extends JFrame {
                 HumanHistoryScoreListPane.getVerticalScrollBar().setValue(value);
                 NumberStringHistoryListPane.getVerticalScrollBar().setValue(value);
                 ComputerHistoryScoreListPane.getVerticalScrollBar().setValue(value);
+                NodeHistoryListPane.getVerticalScrollBar().setValue(value);
+                TurnTimeHistoryListPane.getVerticalScrollBar().setValue(value);
+            }
+        });
+
+        NodeHistoryListPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+            public void adjustmentValueChanged(AdjustmentEvent e) {
+                int value = e.getValue();
+
+                HumanHistoryScoreListPane.getVerticalScrollBar().setValue(value);
+                NumberStringHistoryListPane.getVerticalScrollBar().setValue(value);
+                ComputerHistoryScoreListPane.getVerticalScrollBar().setValue(value);
+                PlayerMoveHistoryListPane.getVerticalScrollBar().setValue(value);
+                TurnTimeHistoryListPane.getVerticalScrollBar().setValue(value);
+            }
+        });
+
+        TurnTimeHistoryListPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+            public void adjustmentValueChanged(AdjustmentEvent e) {
+                int value = e.getValue();
+
+                HumanHistoryScoreListPane.getVerticalScrollBar().setValue(value);
+                NumberStringHistoryListPane.getVerticalScrollBar().setValue(value);
+                ComputerHistoryScoreListPane.getVerticalScrollBar().setValue(value);
+                PlayerMoveHistoryListPane.getVerticalScrollBar().setValue(value);
+                NodeHistoryListPane.getVerticalScrollBar().setValue(value);
             }
         });
 
@@ -268,6 +362,18 @@ public class PlayingForm extends JFrame {
                 dispose();
             }
         });
+
+        ShowHideStatisticsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                TurnTimeHistoryListPane.setVisible(!TurnTimeHistoryListPane.isVisible());
+                NodeHistoryListPane.setVisible(!NodeHistoryListPane.isVisible());
+                NodeHistoryListPaneLabel.setVisible(!NodeHistoryListPaneLabel.isVisible());
+                TurnTimeHistoryListPaneLabel.setVisible(!TurnTimeHistoryListPaneLabel.isVisible());
+
+                ShowHideStatisticsButton.setText(TurnTimeHistoryListPane.isVisible() ? "Hide statistics" : "Show statistics");
+            }
+        });
     }
 
     public void scrollPaneToBottom(JScrollPane pane, JList<String> list, DefaultListModel<String> model) {
@@ -275,7 +381,8 @@ public class PlayingForm extends JFrame {
         viewport.scrollRectToVisible(list.getCellBounds(model.getSize() - 1, model.getSize() - 1));
     }
 
-    public void setStatus(String numberString, int humanScore, int computerScore, Player playerMove) {
+    public void setStatus(String numberString, int humanScore, int computerScore, Player playerMove, long turnTime,
+                          int visitedNodeCount, int generatedNodeCount, int graphNodeCount) {
         PlayerMoveHistoryListModel.addElement(this.playerMove == null ? " " : String.valueOf(this.playerMove));
 
         this.playerMove = playerMove;
@@ -289,6 +396,8 @@ public class PlayingForm extends JFrame {
         HumanHistoryScoreListModel.addElement(String.valueOf(humanScore));
         ComputerHistoryScoreListModel.addElement(String.valueOf(computerScore));
         NumberStringHistoryListModel.addElement(numberString.isEmpty() ? " " : numberString);
+        TurnTimeHistoryListModel.addElement(turnTime > 0 ? String.valueOf(turnTime / 1000000.0) : " ");
+        NodeHistoryListModel.addElement(visitedNodeCount + " / " + graphNodeCount + " / " + generatedNodeCount);
     }
 
     public void setResults(Player[] winners) {

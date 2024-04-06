@@ -28,6 +28,7 @@ public class Graph {
         // Glabās pievienojamo virsotni
         Node newNode = new Node(playerScores, numberString, parentNode, turn, move);
         parentNode.addChild(newNode);
+        nodeCount++;
         return newNode;
     }
 
@@ -57,19 +58,16 @@ public class Graph {
             // Ja ņem ciparu 1-4
             if (i < 5 && Move.takeNumber(copyOfNS, copyOfPS, currentPlayer, i)) {
                 Node newNode = createNewNode(copyOfNS, copyOfPS, currentNode, turn, i);
-                nodeCount++;
                 addNodes(copyOfPS, copyOfNS, newNode, (playerMove == 0 ? 1 : 0));
             }
             // Ja dala 2
             else if (i == 5 && Move.splitNumber2(copyOfNS, copyOfPS, opponentPlayer)) {
                 Node newNode = createNewNode(copyOfNS, copyOfPS, currentNode, turn, i);
-                nodeCount++;
                 addNodes(copyOfPS, copyOfNS, newNode, (playerMove == 0 ? 1 : 0));
             }
             // Ja dala 4
             else if (i == 6 && Move.splitNumber4(copyOfNS, copyOfPS, opponentPlayer)) {
                 Node newNode = createNewNode(copyOfNS, copyOfPS, currentNode, turn, i);
-                nodeCount++;
                 addNodes(copyOfPS, copyOfNS, newNode, (playerMove == 0 ? 1 : 0));
             }
         }
