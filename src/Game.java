@@ -17,8 +17,8 @@ public class Game implements StartGameListener, PlayingGameListener {
     // Ik pēc cik gājieniem ģenerēt jaunu grafu
     // Var nomainīt uz mazāku skaitli, ja grib svaigāku informāciju
     static final private int VALID_TURNS = MAX_DEPTH - 2;
-    private static final int LOWER_BOUND = 5; // Kad pabeigts jābūt 15
-    private static final int UPPER_BOUND = 20; // Kad pabeigts jābūt 20
+    private static final int LOWER_BOUND = 15;
+    private static final int UPPER_BOUND = 20;
 
     private AlgorithmType algorithmType;
     private NumberString nS;
@@ -48,6 +48,7 @@ public class Game implements StartGameListener, PlayingGameListener {
         this.startForm = startForm;
     }
 
+    // Šī funkcija tiek izsaukta no spēles sākuma formas. Atbild par spēles sākuma informācijas uzstādīšanu
     public void startNewGame(int length, Player firstPlayer, AlgorithmType algorithm) {
         if (!isValidLength(length))
             return;
@@ -88,6 +89,7 @@ public class Game implements StartGameListener, PlayingGameListener {
         return LOWER_BOUND <= length && length <= UPPER_BOUND;
     }
 
+    // Šī funkcija tiek izsaukta no formas. Atbild par spēles gājienu
     public boolean takeTurn(int move) {
         if (status != GameStatus.Playing)
             return false;
@@ -111,8 +113,10 @@ public class Game implements StartGameListener, PlayingGameListener {
             activeNode = activeNode.getChildWithMove(move);
         }
         else {
+            // Atrod nākamo gājienu
             Node bestMove = getBestMove();
 
+            // Ja zem aktīvā node nav nākamā gājiena nodes tad pārģenerē ceļu
             if (activeNode != bestMove.getParent()) {
                 bestEndNode = null;
                 bestMove = getBestMove();
@@ -138,6 +142,7 @@ public class Game implements StartGameListener, PlayingGameListener {
         return true;
     }
 
+    // Izmantojot iegūto labāko gala stāvokli tiek atrast šī brīža nepieciešamais gājiens, lai tiktu uz to beigu node,
     private Node getBestMove() {
         if (bestEndNode == null)
             generateBestEndNode();
@@ -150,6 +155,8 @@ public class Game implements StartGameListener, PlayingGameListener {
         return bestMove;
     }
 
+    // Tiek izsaukta nepieciešamā metode, lai iegūtu labāko gala node
+    // Vienmēr izsauc datora gājienā un sāk kā maksimizētājs
     private void generateBestEndNode() {
         if (algorithmType == AlgorithmType.AlphaBeta)
             bestEndNode = alphaBeta(activeNode, MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
@@ -157,6 +164,7 @@ public class Game implements StartGameListener, PlayingGameListener {
             bestEndNode = minimax(activeNode, MAX_DEPTH, true);
     }
 
+    // Tiek veikts gājiens
     private boolean takeMove(int move) {
         Player opponentPlayer = getOponentPlayer();
 
@@ -186,6 +194,7 @@ public class Game implements StartGameListener, PlayingGameListener {
         return false;
     }
 
+    // Funkcijas "alphaBeta" koda daļa ņemta no ChatGPT, bet pielāgota pēc vajadzībām
     private Node alphaBeta(Node node, int depth, int alpha, int beta, boolean maximizingPlayer) {
 
         visitedNodeCount++;
