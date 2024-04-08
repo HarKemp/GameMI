@@ -104,13 +104,24 @@ public class Graph {
 
         heuristic += computerScore * 10;
         heuristic += (computerScore - humanScore);
-
-        if (currentNode.getMove() <= 4) {
-            heuristic += (currentNode.getMove() * 10);
-        }
+        heuristic += getPreviousCompMoves(currentNode);
 
         return heuristic;
     }
+
+
+    int getPreviousCompMoves(Node currentNode) {
+
+        if (currentNode.getParent() == null) {
+            if (currentNode.getMove() <= 4) return currentNode.getMove() * 5;
+            else return 0;
+        }
+        int score = getPreviousCompMoves(currentNode.getParent());
+        if (currentNode.getMove() <= 4) return score + currentNode.getMove() * 5;
+        else return score;
+
+    }
+
 
 
     //TODO TEST -> No ChatGPT
