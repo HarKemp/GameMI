@@ -117,9 +117,6 @@ public class Game implements StartGameListener, PlayingGameListener {
 
         playingForm.setStatus(nS.convertToString(), playerScores[0], playerScores[1], playerMove);
 
-        //TODO remove
-        //graph.printGraph(VALID_TURNS - (generatedUntilTurn - currentTurn));
-
         if (nS.isEmpty()) {
             status = GameStatus.Ended;
             printResults();
