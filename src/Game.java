@@ -145,9 +145,9 @@ public class Game implements StartGameListener, PlayingGameListener {
     // Vienmēr izsauc datora gājienā un sāk kā maksimizētājs
     private void generateBestEndNode() {
         if (algorithmType == AlgorithmType.AlphaBeta)
-            bestEndNode = alphaBeta(activeNode, MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+            bestEndNode = alphaBeta(activeNode, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
         else
-            bestEndNode = minimax(activeNode, MAX_DEPTH, true);
+            bestEndNode = minimax(activeNode, true);
     }
 
     // Tiek veikts gājiens
@@ -181,10 +181,9 @@ public class Game implements StartGameListener, PlayingGameListener {
     }
 
     // Funkcijas "alphaBeta" koda daļa ņemta no ChatGPT, bet pielāgota pēc vajadzībām
-    private Node alphaBeta(Node node, int depth, int alpha, int beta, boolean maximizingPlayer) {
-        if (depth == 0 || node.getChildren().isEmpty()) {
+    private Node alphaBeta(Node node, int alpha, int beta, boolean maximizingPlayer) {
+        if (node.getChildren().isEmpty())
             return node;
-        }
 
         Node bestNode = null;
         Node resultNode;
@@ -193,7 +192,7 @@ public class Game implements StartGameListener, PlayingGameListener {
         if (maximizingPlayer) {
             value = Integer.MIN_VALUE;
             for (Node child : node.getChildren()) {
-                resultNode = alphaBeta(child, depth - 1, alpha, beta, false);
+                resultNode = alphaBeta(child, alpha, beta, false);
                 if (resultNode.getHeuristic() > value) {
                     value = resultNode.getHeuristic();
                     bestNode = resultNode;
@@ -207,7 +206,7 @@ public class Game implements StartGameListener, PlayingGameListener {
         } else {
             value = Integer.MAX_VALUE;
             for (Node child : node.getChildren()) {
-                resultNode =  alphaBeta(child, depth - 1, alpha, beta, true);
+                resultNode =  alphaBeta(child, alpha, beta, true);
                 if (resultNode.getHeuristic() < value) {
                     value = resultNode.getHeuristic();
                     bestNode = resultNode;
@@ -224,10 +223,9 @@ public class Game implements StartGameListener, PlayingGameListener {
         return bestNode;
     }
 
-    private Node minimax(Node node, int depth, boolean maximizingPlayer) {
-        if (depth == 0 || node.getChildren().isEmpty()) {
+    private Node minimax(Node node, boolean maximizingPlayer) {
+        if (node.getChildren().isEmpty())
             return node;
-        }
 
         Node bestNode = null;
         Node resultNode;
@@ -236,7 +234,7 @@ public class Game implements StartGameListener, PlayingGameListener {
         if (maximizingPlayer) {
             value = Integer.MIN_VALUE;
             for (Node child : node.getChildren()) {
-                resultNode = minimax(child, depth - 1, false);
+                resultNode = minimax(child, false);
                 if (resultNode.getHeuristic() > value) {
                     value = resultNode.getHeuristic();
                     bestNode = resultNode;
@@ -246,7 +244,7 @@ public class Game implements StartGameListener, PlayingGameListener {
         } else {
             value = Integer.MAX_VALUE;
             for (Node child : node.getChildren()) {
-                resultNode = minimax(child, depth - 1, true);
+                resultNode = minimax(child, true);
                 if (resultNode.getHeuristic() < value) {
                     value = resultNode.getHeuristic();
                     bestNode = resultNode;
