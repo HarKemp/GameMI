@@ -2,7 +2,10 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Graph {
+
+    // Maksimālais iespējamais koka dziļums
     private final int MAX_DEPTH;
+    // Atsauce uz koka saknes virsotni
     private final Node graph;
 
     Graph(int[] playerScores, NumberString numberString, int maxDepth, int turn, int playerMove) {
@@ -19,6 +22,7 @@ public class Graph {
     private Node createNewNode(NumberString numberString, int[] playerScores, Node parentNode, int turn, int move) {
         // Glabās pievienojamo virsotni
         Node newNode = new Node(playerScores, numberString, parentNode, turn, move);
+        // Priekštecim pievieno atsauci uz tikko izveidoto virsotni
         parentNode.addChild(newNode);
         return newNode;
     }
@@ -85,7 +89,7 @@ public class Graph {
         }
     }
 
-    // Piešķir virsotnēm heiristiskos novērtējumus ar no mērķa virzīto pārmeklēšanu dziļumā
+    // Piešķir heiristisko vērtējumu
     void assignHeuristic(Node currentNode) {
         // Gala virsotnei piešķir heiristisko novērtējumu
         currentNode.setHeuristic(heuristicFunction(currentNode));
