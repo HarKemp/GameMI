@@ -97,20 +97,19 @@ public class Game implements StartGameListener, PlayingGameListener {
         long startTime = System.nanoTime();
 
         //Ģenerē grafu
-        if (generatedUntilTurn <= currentTurn) {
+        if (generatedUntilTurn <= currentTurn && playerMove == Player.Computer) {
             generatedUntilTurn = currentTurn + VALID_TURNS;
             graph = new Graph(playerScores, nS, MAX_DEPTH, currentTurn, playerMove.getValue());
             activeNode = graph.getRootNode();
             generatedNodeCount += graph.getNodeCount();
         }
 
-        // Pieskaita kopējam virsotņu skaitam visu NĀKAMĀ līmeņa virsotņu skaitu
-        graphNodeCount += activeNode.getChildren().size();
-
         if (playerMove == Player.Human){
             if (takeMove(move))
                 return false;
-            activeNode = activeNode.getChildWithMove(move);
+
+            if (graph != null)
+                activeNode = activeNode.getChildWithMove(move);
         }
         else {
             // Atrod nākamo gājienu

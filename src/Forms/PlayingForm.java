@@ -397,7 +397,7 @@ public class PlayingForm extends JFrame {
         ComputerHistoryScoreListModel.addElement(String.valueOf(computerScore));
         NumberStringHistoryListModel.addElement(numberString.isEmpty() ? " " : numberString);
         TurnTimeHistoryListModel.addElement(turnTime > 0 ? String.valueOf(turnTime / 1000000.0) : " ");
-        NodeHistoryListModel.addElement(visitedNodeCount + " / " + graphNodeCount + " / " + generatedNodeCount);
+        NodeHistoryListModel.addElement(visitedNodeCount + " / " + generatedNodeCount);
     }
 
     public void setResults(Player[] winners) {
