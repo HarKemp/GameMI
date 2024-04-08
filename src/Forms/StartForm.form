@@ -44,7 +44,7 @@
             </constraints>
             <properties>
               <labelFor value="70aee"/>
-              <text value="String length:"/>
+              <text value="String length (15-20):"/>
             </properties>
           </component>
           <component id="eb63" class="javax.swing.JComboBox" binding="FirstPlayerComboBox">
