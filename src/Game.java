@@ -80,7 +80,7 @@ public class Game implements StartGameListener, PlayingGameListener {
             return false;
 
         //Ģenerē grafu
-        if (generatedUntilTurn <= currentTurn) {
+        if (generatedUntilTurn <= currentTurn && playerMove == Player.Computer) {
             generatedUntilTurn = currentTurn + VALID_TURNS;
             graph = new Graph(playerScores, nS, MAX_DEPTH, currentTurn, playerMove.getValue());
             activeNode = graph.getRootNode();
@@ -89,7 +89,10 @@ public class Game implements StartGameListener, PlayingGameListener {
         if (playerMove == Player.Human){
             if (takeMove(move))
                 return false;
-            activeNode = activeNode.getChildWithMove(move);
+
+            if (graph != null)
+                activeNode = activeNode.getChildWithMove(move);
+
         }
         else {
             Node bestMove = getBestMove();

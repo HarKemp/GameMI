@@ -102,8 +102,9 @@ public class Graph {
         int humanScore = currentNode.getPlayerScores()[0];
         int computerScore = currentNode.getPlayerScores()[1];
 
+        heuristic += computerScore * 10;
         heuristic += (computerScore - humanScore);
-//        heuristic -= currentNode.getTurn();
+
         if (currentNode.getMove() <= 4) {
             heuristic += (currentNode.getMove() * 10);
         }
