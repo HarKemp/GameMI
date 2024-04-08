@@ -2,43 +2,40 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Node {
+    // Masīvs ar spēlētāju punktu skaitie
     private final int[] playerScores;
+    // Masīvs, kas satur skaitļu virkni
     private final int[] numberString;
     // Saraksts ar tiešajiem, šīs virsotnes, bērniem
     private final List<Node> childList = new LinkedList<>();
-    // Saraksts ar tiešajiem, šīs virsotnes, vecākiem
-    private final List<Node> parentList = new LinkedList<>();
-
-    // Noklusējumā visszemākais iespējamais int vērtējums (ja šī virsotne nav gala virsotne)
+    // Atsauce uz virsotnes priekšteci
+    private final Node parent;
+    // Noklusējumā heiristiskais novērtējums būs
+    // visszemākais iespējamais int vērtējums (ja šī virsotne nav gala virsotne)
     private int heuristic = Integer.MIN_VALUE;
-    // Relatīvi noteiktais gājiens pēc kārtas konkrētajā grafā
-    private int turn;
+    // Gājiens pēc kārtas konkrētajā spēlē
+    private final int turn;
+    // Nosaka gājienu, kāds tika veikts, lai iegūtu šajā virsotnē glabāto spēles stāvokli (1 - 6)
     private final int move;
 
     Node (int[] playerScores, NumberString numberString, Node parent, int turn, int move) {
         this.playerScores = playerScores;
         this.numberString = numberString.convertToStaticArray();
-        this.parentList.add(parent);
+        this.parent = parent;
         this.turn = turn;
         this.move = move;
-        //generateHeuristic();
-    }
-
-    // Heiristiskā funkcija
-    private void generateHeuristic() {
-        this.heuristic = this.playerScores[1] - this.playerScores[0];
     }
 
     void addChild(Node child) {
         this.childList.add(child);
     }
 
-    NumberString getNumberString() {
-        return new NumberString(this.numberString);
-    }
-
     int[] getPlayerScores() {
         return playerScores;
+    }
+
+    NumberString getNumberString() {
+        return new NumberString(this.numberString);
     }
 
     void setHeuristic(int heuristic) {
@@ -49,10 +46,6 @@ public class Node {
         return this.heuristic;
     }
 
-    void setTurn(int turn) {
-        this.turn = turn;
-    }
-
     int getTurn() {
         return this.turn;
     }
@@ -61,11 +54,7 @@ public class Node {
         return this.move;
     }
 
-    // Atgriež konkrētu virsotnes bērnu
-    Node getChild(int childIndex) {
-        return childList.get(childIndex);
-    }
-
+    // Atgriež to pēcteci, kas atbilst konkrēta gājiena rezultātā radītajam stāvoklim
     Node getChildWithMove(int move) {
         for (Node node : childList) {
             if (node.move == move) {
@@ -75,16 +64,11 @@ public class Node {
         return null;
     }
 
-    // Atgriež visu virsotnes bērnu sarakstu
     List<Node> getChildren() {
         return childList;
     }
 
-    List<Node> getParents() {
-        return parentList;
-    }
-
     Node getParent() {
-        return parentList.get(0);
+        return parent;
     }
 }
